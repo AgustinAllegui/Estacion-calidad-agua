@@ -1,0 +1,69 @@
+'This program example demonstrates CR800 serial I/O features by:
+' 1. Simulating a serial sensor
+' 2. Transmitting a serial string via COM1 TX.
+
+'The serial string is received at COM2 RX via jumper wire. Simulated
+'air temperature = 27.435 F, relative humidity = 56.789 %.
+
+'Wiring:
+'COM1 TX (C1) ----- COM2 RX (C4)
+'Serial Out Declarations
+
+
+Public TempOut As Float
+Public RhOut As Float
+
+'Declare a string variable large enough to hold the output string.
+Public SerialOutString As String * 25
+
+'Serial In Declarations
+'Declare a string variable large enough to hold the input string
+Public SerialInString As String * 25
+
+'Declare strings to accept parsed data. If parsed data are strictly numeric, this
+'array can be declared as Float or Long
+Public InStringSplit(2) As String
+Alias InStringSplit(1) = TempIn
+Alias InStringSplit(2) = RhIn
+
+'Main Program
+BeginProg
+
+  'Simulate temperature and RH sensor
+  TempOut = 27.435 'Set simulated temperature to transmit
+  RhOut = 56.789 'Set simulated relative humidity to transmit
+
+  Scan(5,Sec, 3, 0)
+    If TempOut >= 30 Then 
+      TempOut = 20.435
+    Else 
+      TempOut = TempOut + 1
+    EndIf 
+
+    'Serial Out Code
+    'Transmits string "*27.435,56.789#" out COM1
+    SerialOpen(Com1,9600,0,0,10000) 'Open a serial port
+  
+    'Build the output string
+    SerialOutString = "*" & TempOut & "," & RhOut & "#"
+
+    'Output string via the serial port
+    SerialOut(Com1,SerialOutString,"",0,100)
+
+    'Serial In Code
+    'Receives string "27.435,56.789" via COM2
+    'Uses * and # character as filters
+    SerialOpen(Com2,9600,0,0,10000) 'Open a serial port
+
+    'Receive serial data as a string
+    '42 is ASCII code for "*", 35 is code for "#"
+    SerialInRecord(Com2,SerialInString,42,0,35,"",01)
+
+    'Parse the serial string
+    SplitStr(InStringSplit(),SerialInString,"",2,0)
+    
+  NextScan
+
+
+
+EndProg

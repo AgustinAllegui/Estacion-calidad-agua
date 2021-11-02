@@ -1,0 +1,109 @@
+'CR800 Series
+'Created by Short Cut (4.4)
+
+'Declare Variables and Units
+Dim Rs
+Dim pHMult
+Public BattV
+Public PTemp_C
+Public DOmV
+Public DOppm
+Public Cond
+Public Ct
+Public Temp_C
+Public OBS500(4)
+Public pH
+
+Alias OBS500(1)=Turb_BS
+Alias OBS500(2)=Turb_SS
+Alias OBS500(3)=Temp_C_2
+Alias OBS500(4)=WD_OBS
+
+Units BattV=Volts
+Units PTemp_C=Deg C
+Units DOmV=mV
+Units DOppm=ppm
+Units Cond=mS/cm
+Units Ct=mS/cm
+Units Temp_C=Deg C
+Units pH=pH
+Units Turb_BS=FBU
+Units Turb_SS=FNU
+Units Temp_C_2=Deg C
+Units WD_OBS=unitless
+
+'Define Data Tables
+DataTable(Hourly,True,-1)
+	DataInterval(0,60,Min,10)
+	Sample(1,DOmV,FP2)
+	Sample(1,DOppm,FP2)
+	Sample(1,Cond,FP2)
+	Sample(1,Ct,IEEE4)
+	Sample(1,Temp_C,FP2)
+	Sample(1,Turb_BS,FP2)
+	Sample(1,Turb_SS,FP2)
+	Sample(1,Temp_C_2,FP2)
+	Sample(1,WD_OBS,FP2)
+	Sample(1,pH,FP2)
+EndTable
+
+DataTable(Daily,True,-1)
+	DataInterval(0,1440,Min,10)
+	Minimum(1,BattV,FP2,False,False)
+EndTable
+
+'Main Program
+BeginProg
+	'Main Scan
+	Scan(5,Sec,1,0)
+		'Default CR800 Datalogger Battery Voltage measurement 'BattV'
+		Battery(BattV)
+		'Default CR800 Datalogger Wiring Panel Temperature measurement 'PTemp_C'
+		PanelTemp(PTemp_C,_50Hz)
+		'CS511 Dissolved Oxygen Probe measurements 'DOmV' and 'DOppm'
+		VoltSe (DOmV,1,mV2500,2,1,0,_50Hz,1.0,0) 'Aca hice unos cambios (Nueva entrada: SE2)
+		DOppm=DOmV*0.34
+		'CS547A Conductivity and Temperature Probe measurements 'Cond', 'Ct', and 'Temp_C'
+		'Make preliminary voltage measurement
+		BrFull(Rs,1,mV2500,2,1,1,2500,True,True,0,250,-0.001,1)
+		'Convert voltage measurement to resistance
+		Rs=Rs/(1-Rs)
+		'Make refined voltage measurement based on preliminary measurement
+		Select Case Rs
+			Case Is <1.8
+				BrHalf(Rs,1,mV2500,4,1,1,2500,True,0,250,1,0)
+			Case Is <9.25
+				BrFull(Rs,1,mV2500,2,1,1,2500,True,True,0,250,-0.001,1)
+			Case Is <280
+				BrFull(Rs,1,mV250,2,1,1,2500,True,True,0,250,-0.001,1)
+		EndSelect
+		'Convert voltage measurement to resistance
+		Rs=Rs/(1-Rs)
+		'Subtract resistance errors
+		Rs=Rs-(2.5*0.000032+0.005)
+		'Calculate EC
+		Ct=(1/Rs)*1.5
+		'Correct EC for ionization errors
+		If Ct<0.474 Then
+			Ct=Ct*0.95031-0.00378
+		Else
+			Ct=-0.02889+(0.98614*Ct)+(0.02846*Ct^2)
+		EndIf
+		'Make temperature measurement (Deg C)
+		Therm107(Temp_C,1,1,2,0,250,1,0)
+		'Correct EC for temperature errors
+		Cond=(Ct*100)/((Temp_C-25)*2+100)
+		'Trap measurements below 0.005 mS/cm threshold
+		If Cond<0.005 Then Cond=0.005
+		'OBS500/OBS501 Smart Turbidity Meter (SDI-12) measurements 'Turb_BS', 'Turb_SS', 'Temp_C_2', and 'WD_OBS'
+		SDI12Recorder(OBS500(),3,"0","M!",1,0,-1)
+		'CSIM11 pH Probe (ISI M11-pH) measurement 'pH'
+		'Calculate temperature correction multiplier
+		pHMult=-1/(((Temp_C+273)/298)*59)
+		'Make pH measurement
+		VoltDiff(pH,1,mV2500,3,True,0,_50Hz,pHMult,7)
+		'Call Data Tables and Store Data
+		CallTable Hourly
+		CallTable Daily
+	NextScan
+EndProg

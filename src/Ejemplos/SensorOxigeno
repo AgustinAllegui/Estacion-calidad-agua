@@ -1,0 +1,44 @@
+'CR800 Series
+'Created by Short Cut (4.4)
+
+'Declare Variables and Units
+Public BattV
+Public PTemp_C
+Public DOmV
+Public DOppm
+
+Units BattV=Volts
+Units PTemp_C=Deg C
+Units DOmV=mV
+Units DOppm=ppm
+
+'Define Data Tables
+DataTable(Hourly,True,-1)
+	DataInterval(0,60,Min,10)
+	Sample(1,DOmV,FP2)
+	Sample(1,DOppm,FP2)
+EndTable
+
+DataTable(Daily,True,-1)
+	DataInterval(0,1440,Min,10)
+	Minimum(1,BattV,FP2,False,False)
+EndTable
+
+'Main Program
+BeginProg
+	'Main Scan
+	Scan(5,Sec,1,0)
+		'Default CR800 Datalogger Battery Voltage measurement 'BattV'
+		Battery(BattV)
+		'Default CR800 Datalogger Wiring Panel Temperature measurement 'PTemp_C'
+		PanelTemp(PTemp_C,_50Hz)
+		'CS511 Dissolved Oxygen Probe measurements 'DOmV' and 'DOppm'
+		VoltDiff(DOmV,1,mV250,1,True,0,_50Hz,1,0)
+		'CS511 Dissolved Oxygen Sensor measurements DOmV and DOppm:
+VoltDiff(DOmV,1,mV200,1,True,0,60,1,0)
+		DOppm=DOmV*0.34
+		'Call Data Tables and Store Data
+		CallTable Hourly
+		CallTable Daily
+	NextScan
+EndProg

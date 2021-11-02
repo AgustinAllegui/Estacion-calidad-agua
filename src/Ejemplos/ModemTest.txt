@@ -1,0 +1,65 @@
+Public TempOut As Float
+Public RhOut As Float
+Public Count As Long
+
+'Declare a string variable large enough to hold the output string.
+Public SerialOutString As String * 25
+
+'Serial In Declarations
+'Declare a string variable large enough to hold the input string
+Public SerialInString As String * 25
+
+Public BattV
+Public PTemp_C
+
+DataTable(Daily,True,-1)
+	DataInterval(0,1440,Min,10)
+	Minimum(1,BattV,FP2,False,False)
+EndTable
+
+'Main Program
+BeginProg
+
+  'Simulate temperature and RH sensor
+  TempOut = 27.435 'Set simulated temperature to transmit
+  RhOut = 56.789 'Set simulated relative humidity to transmit
+  Count = -1
+
+  Scan(15,Sec, 3, 0)
+    'Default CR800 Datalogger Battery Voltage measurement 'BattV'
+		Battery(BattV)
+    'Default CR800 Datalogger Wiring Panel Temperature measurement 'PTemp_C'
+		PanelTemp(PTemp_C,_50Hz)
+		
+    ' Receive serial data as a string
+    ' 42 is ASCII code for "*", 35 is code for "#"
+    ' SerialInRecord(Com1,SerialInString,42,0,35,"",01)
+    SerialInRecord(Com1,SerialInString,0,0,0,"",01)
+
+    SerialOpen(Com1,19200,16,0,10000) 'Open a serial port
+
+
+
+    Select Case Count
+      Case Is = 0
+        SerialOutString = "AT+SBDD0"& CHR(13) & CHR(10)& ""
+        SerialOut(Com1,SerialOutString,"",0,100)
+      Case Is = 1
+        SerialOutString = "AT+SBDWT=" & Hex(INT(BattV*10))& CHR(13) & CHR(10)& ""
+        SerialOut(Com1,SerialOutString,"",0,100)
+      Case Is = 2
+        SerialOutString = "AT+SBDIX"& CHR(13) & CHR(10)& ""
+'        SerialOut(Com1,SerialOutString,"",0,100)
+      Case Is >  10
+        Count = 0
+    EndSelect
+
+    Count = Count +1
+    
+    CallTable Daily
+    
+  NextScan
+
+
+
+EndProg
