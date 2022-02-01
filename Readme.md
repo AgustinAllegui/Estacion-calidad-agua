@@ -6,7 +6,7 @@ La estación de monitoreo de calidad está basada en un datalogger Campbell CR80
 
 - Datalogger CR800
 - Modem satelital RockBlock Plus
-- Sensor de turbidez OBS501
+- Sensor de turbidez OBS501 (Quitado mientras es reparado)
 - Sensor de oxígeno disuelto CS511-L
 - Sensor de conductividad CS547A
 - Sensor de pH CSIM11
@@ -28,9 +28,22 @@ Los datos que se envían mediante el modem satelital se detallan en [este docume
 
 # Changelog
 
-## v1.1.1
+## v1.1.2
 
-Instalación programada para el 29/12/2021
+Instalado el 30/12/2021.
+
+Se instalo v1.1.1 y se detectaron errores durante las pruebas. Estas se corrigieron en el momento resultado en esta version.
+
+### Características:
+
+- El valor de turbidez se fuerza a 0 ya que este no se encuentra instalado.
+- Quitado envio de comandos para alarma antibandalica. (La implementacion estaba incompleta)
+
+### BugFixs:
+
+- Corregido el error en el cual comienza el envio de los datos a partir del penultimo almacenado en la tabla en vez de el ultimo.
+
+## v1.1.1
 
 ### Características:
 
