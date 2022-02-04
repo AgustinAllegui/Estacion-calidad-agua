@@ -22,7 +22,7 @@ El funcionamiento del programa esta explicado en [este documento](docs/Funcionam
 
 ## Datos enviados
 
-Los datos que se envían mediante el modem satelital se detallan en [este documento](docs/Trama.xlsx)
+Los datos que se envían mediante el modem satelital se detallan en [este documento](docs/Envio_datos/Envio_datos.md)
 
 ---
 
