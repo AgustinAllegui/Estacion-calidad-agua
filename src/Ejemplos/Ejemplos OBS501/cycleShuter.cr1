@@ -1,0 +1,61 @@
+'CR1000 Series Datalogger
+'OBS501 cycle shutter each measurement
+
+' The following CRBasic program:
+' - Opens the shutter if closed, then makes a measurement
+' - Makes a measurement if open, then close
+
+'Declare Public Variables
+Public Open
+
+'Declare Other Variables
+Public OBS501(4)
+Alias OBS501(1) = turb_bs
+Alias OBS501(2) = turb_ss
+Alias OBS501(3) = tempC_OBS501
+Alias OBS501(4) = wet_dry
+Units turb_bs = fbu
+Units turb_ss = fnu
+Units tempC_OBS501 = degC
+Units wet_dry = YesNo
+
+Public obsDatOpen(5)
+Alias obsDatOpen(1) = Open_wiper_position 'Full movement of slider is about 20,000 counts. If it jams, this # will be smaller
+Alias obsDatOpen(2) = Open_Max_mA_cnts 'Number of times the shutter stops while opening because of max current
+Alias obsDatOpen(3) = Open_timout 'Open timeout count. If the threads are stripped the slide 'will not move and this count will increase
+Alias obsDatOpen(4) = Open_mA 'mA current of the motor
+Alias obsDatOpen(5) = Open_total_counts 'total number of open and close cycles
+
+Public obsDatClose(5)
+Alias obsDatClose(1) = Close_wiper_position 'Full movement of slider is about 20,000 counts. If it jams this # will be smaller
+Alias obsDatClose(2) = Close_Max_mA_cnts 'Number of times the shutter stops while opening because of max current
+Alias obsDatClose(3) = Close_timeout 'Close timeout count. If the threads are stripped the slide will not move and this count will increase
+Alias obsDatClose(4) = Close_mA 'mA current of the motor while the shutter is closing
+Alias obsDatClose(5) = Close_total_counts 'total number of open and close cycles
+
+'Define Data Tables
+DataTable (Test,1,1000)
+  DataInterval (0,5,Min,10)
+  Sample (1,turb_bs,FP2)
+  Sample (1,turb_ss,FP2)
+EndTable
+
+
+'Main Program
+BeginProg
+  Scan (60,Sec,0,0)
+    'If open make measurement and close. If closed, open then make measurement.
+    If Open = 1 Then 'If open the make measurement, then close
+      SDI12Recorder(OBS501(),1,0,"M4!",1,0,-1) 'Measure without moving the wiper
+      SDI12Recorder (obsDatClose(),1,0,"M7!",1,0,-1) 'Close wiper
+      Open = 0
+    Else 'if closed
+      SDI12Recorder (obsDatOpen(),1,0,"M3!",1,0,-1) 'Open wiper
+      Delay (0,11,Sec)
+      SDI12Recorder(OBS501(),1,0,"M4!",1,0,-1) 'Measure without moving the wiper
+      Open = 1
+    EndIf
+    'Call Output Tables
+    CallTable Test
+  NextScan
+EndProg
