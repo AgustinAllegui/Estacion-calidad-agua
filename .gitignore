@@ -1,3 +1,4 @@
 ~$*.xlsx
 src/*.tdf
 XXTemp_*.cr8
+devDocs*
