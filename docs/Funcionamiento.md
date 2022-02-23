@@ -2,7 +2,11 @@
 
 Después de inicializar variables, el programa consiste de un bucle en el que las distintas tareas se realizan si se cumplen las condiciones para la misma.
 
-![Programa principal](Diagramas/Diagrama_de_flujo.drawio.png)
+![Programa principal](Diagramas/Diagrama_de_flujo.png)
+
+A continuacion se muestran las tareas en una linea de tiempo
+
+![Linea de tiempo](Diagramas/Linea_tiempo.png)
 
 ### Tareas:
 
@@ -25,4 +29,4 @@ La presencia de datos en la cola para enviar se expresa en la variable _PendingM
 
 Por ejemplo, en el siguiente diagrama, si _age_=2, se enviaran los datos marcados en amarillo. Si el envío es exitoso, se resta 1 a _age_ y el siguiente envió consistirá en los datos marcados en verde.
 
-![age](Diagramas/Data_age.drawio.png)
+![age](Diagramas/Data_age.png)

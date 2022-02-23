@@ -6,7 +6,15 @@ Los datos se comprimen para ser enviados en un payload menor a 50 bytes. Esto po
 
 En [este documento](formato_trama.xlsx) se explica el significado de cada byte.
 
-> Actualmente el software usa el **ReportID 03**
+> Actualmente el software usa el **ReportID 04**
+
+### Dato *Estado de OBS501*
+
+Este dato contiene el el bit mas significativo una bandera que indica si el sensor de turbidez requiere mantenimiento en forma urgente. Esta se activa cuando falla el mecanismo de limpieza del sensor o cuando se detecta humedad en el circuito de control.
+
+Ademas, se envia la maxima corriente que uso el motor durante el ultimo ciclo. Cuando este valor aumenta, indica que el sensor necesitara limpieza proximamente. El umbral para esto debe fijarse observando el funcionamiento de la estacion en el campo.
+
+> Normally the current is around 175 mA. As sand grits lodge in the groves, the resistance to movement increases and the motor has to work harder. This increases the current usage. Therefore, increased current usage indicates the wiper needs to be cleaned. However, open/close currents also increase with decreasing temperature, independently of sediment concentration. The best way to determine if a sensor is having trouble with sediment is to monitor current usage regularly so you can detect an increase
 
 ## Ejemplo de decodificacion
 
