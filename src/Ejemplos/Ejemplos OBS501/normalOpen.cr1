@@ -1,0 +1,74 @@
+'CR1000 Series Datalogger with OS29 or higher
+'If you do not have OS29 or higher, there will be a compile error due to the new optional
+'parameters in the SDI12recorder instructions.
+
+'OBS501 normally open
+
+'In normally open mode, the OBS501 can make measurement multiple times per minute but the wiper
+'interval could be set to as low as a time or two a day. This mode is also beneficial where the
+'power budget is critical since opening and closing the wiper consumes considerably more power
+'than making the turbidity measurement.
+
+'Declare Public Variables
+Public OBS501(4)
+Alias OBS501(1) = turb_bs
+Alias OBS501(2) = turb_ss
+Alias OBS501(3) = tempC_OBS501
+Alias OBS501(4) = wet_dry
+
+Units turb_bs = fbu
+Units turb_ss = fnu
+Units tempC_OBS501 = degC
+Units wet_dry = YesNo
+
+Public obsDatOpen(5)
+Alias obsDatOpen(1) = OpenPos_cnts 'Full movement of slider is about 20,000 counts. If it jams, this # will be smaller
+Alias obsDatOpen(2) = Open_Max_mA_cnts 'Number of times the shutter stops while opening because of max current
+Alias obsDatOpen(3) = Open_timout_cnts 'Open timeout count. If the threads are stripped, the slide will not move and this count will increase
+Alias obsDatOpen(4) = Open_mA 'mA current of the motor
+Alias obsDatOpen(5) = Total_Open_cnts 'Total times the sensor has opened (count)
+
+
+Public obswipe(7)
+Alias obswipe(1) = Total_open_close 'Total number of times the unit has open and closed (count)
+Alias obswipe(2) = Wipe_open_pos_cnt 'Full movement of slider is about 16,400 counts. If it jams, this # will be smaller
+Alias obswipe(3) = Wipe_open_MaxmA_cnt 'Number of times the shutter stops while opening because of max current
+Alias obswipe(4) = Wipe_open_timout_cnt 'Open timeout count. If threads are stripped, the slide will not move and this count will increase
+Alias obswipe(5) = Wipe_close_pos_cnt 'Full movement of slider is about 16,400 counts. If it jams, this # will be smaller
+Alias obswipe(6) = wipe_close_MaxmA_cnt 'Number of times the shutter stops while closing because of max current
+Alias obswipe(7) = wipe_close_timeout_cnts 'Close timeout count. If the threads are stripped, the slide will not move and this count will increase
+
+'Declare Other Variables
+Public TimeCounter
+
+'Define Data Tables
+DataTable (Test,1,1000)
+  DataInterval (0,5,Min,10)
+  Sample (1,turb_bs,FP2)
+  Sample (1,turb_ss,FP2)
+  Sample (1,tempC_OBS501,FP2)
+EndTable
+
+
+'Main Program
+BeginProg
+  SDI12Recorder (obsDatOpen(),1,0,"M3!",1,0,-1) 'Start with shutter open
+  'The last parameter tells the datalogger to put a "nan" inside all the elements of the
+  'destination array. This is one of a few new features. If you are running and OS older than 29,
+  'you will need to remove the ",-1" before the last parenthesis. Also need to remove the -1
+  'from the next two sdi12recorder instructions.
+  
+  Scan (1,Min,0,0)
+    TimeCounter = TimeCounter + 1
+    'Wipe at a slower interval than the scan interval
+    If TimeCounter >= 60 Then 'This value, 60, will wipe once every 60 scan intervals.
+      '60 min. in this case
+      SDI12Recorder (obswipe(),1,0,"M9!",1,0,-1) 'This will issue the wipe command
+      TimeCounter = 0
+    EndIf
+    'Read OBS501 each scan interval
+    SDI12Recorder(OBS501(),1,0,"M4!",1,0,-1) 'Measure without moving the wiper
+    'Call Output Tables
+    CallTable Test
+  NextScan
+EndProg

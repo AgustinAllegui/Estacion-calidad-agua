@@ -6,15 +6,16 @@ La estación de monitoreo de calidad está basada en un datalogger Campbell CR80
 
 - Datalogger CR800
 - Modem satelital RockBlock Plus
-- Sensor de turbidez OBS501 (Quitado mientras es reparado)
+- Sensor de turbidez OBS501
 - Sensor de oxígeno disuelto CS511-L
 - Sensor de conductividad CS547A
 - Sensor de pH CSIM11
+- Sensor de apertura de gabinete
 
 ## Conexión de sensores y modem
 
 Las conexiones pueden encontrarse detalladas en [este documento](docs/Datalogger/Conexion_Sensores.xlsx) o en el siguiente grafico
-![Conexiones](docs/Diagramas/Diagrama_de_conexiones.drawio.png)
+![Conexiones](docs/Diagramas/Diagrama_de_conexiones.png)
 
 ## Funcionamiento
 
@@ -27,6 +28,13 @@ Los datos que se envían mediante el modem satelital se detallan en [este docume
 ---
 
 # Changelog
+
+## v1.3
+
+### Características:
+
+- Ahora el sensor de turbidez funciona en modo normal abierto. Se realiza el ciclo de limpieza de lente (cerrar y abrir) cada 4 horas (antes de las lecturas 1 y 3).
+- Agregada alarma de apertura.
 
 ## v1.1.2
 
