@@ -33,6 +33,8 @@ Los datos que se envían mediante el modem satelital se detallan en [este docume
 
 ### Características:
 
+- Report ID cambiado a 0x04:
+  - Agregado estado del sensor de turbidez al reporte (1 bit de estado + corriente de motor).
 - Ahora el sensor de turbidez funciona en modo normal abierto. Se realiza el ciclo de limpieza de lente (cerrar y abrir) cada 4 horas (antes de las lecturas 1 y 3).
 - Agregada alarma de apertura.
 
