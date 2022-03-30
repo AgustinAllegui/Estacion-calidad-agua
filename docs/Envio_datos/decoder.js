@@ -11,7 +11,7 @@
  */
 const parsePayload = function (payloadHexStr) {
   let payload = new Buffer.from(payloadHexStr, "hex");
-  if (payload.readUint8(0) != 0x04) {
+  if (payload.readUint8(0) != 0x05) {
     throw "Report ID incorrecto";
   }
 
@@ -38,14 +38,17 @@ const parsePayload = function (payloadHexStr) {
   let OBS501StatusRaw = payload.readUInt16BE(46);
   let OBS501Status = {
     maintenanceRequired: OBS501StatusRaw >= 0x8000,
-    current: OBS501StatusRaw & 0x7fff,
+    motorCurrent: OBS501StatusRaw & 0x7fff,
   };
 
+  let panelTempMin = payload.readUInt16BE(48) / 10 - 100;
+
   return {
-    battery: {
-      voltage: batteryVoltage,
+    Status: {
       timestamp: initialTimestamp,
+      batteryVoltage: batteryVoltage,
       OBS501Status: OBS501Status,
+      panelTempMin: panelTempMin,
     },
     samples: samples,
   };
@@ -54,7 +57,7 @@ const parsePayload = function (payloadHexStr) {
 /*****************************************************************/
 
 const payloadHexStr =
-  "042561f983300003000500fc004d00000003000500df004f00000003000500c9005000000003000500b50051000080FE";
+  "051762393bb000430000000000510008004300000000005100050043000000000051000500430000000000510005010403D6";
 let parsedPayload;
 try {
   parsedPayload = parsePayload(payloadHexStr);
