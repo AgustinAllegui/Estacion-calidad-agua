@@ -14,7 +14,7 @@ La estación de monitoreo de calidad está basada en un datalogger Campbell CR80
 
 ## Conexión de sensores y modem
 
-Las conexiones pueden encontrarse detalladas en [este documento](docs/Datalogger/Conexion_Sensores.xlsx) o en el siguiente grafico
+Las conexiones pueden encontrarse detalladas en [este documento](docs/Conexion_Sensores.xlsx) o en el siguiente grafico
 ![Conexiones](docs/Diagramas/Diagrama_de_conexiones.png)
 
 ## Funcionamiento
@@ -28,6 +28,14 @@ Los datos que se envían mediante el modem satelital se detallan en [este docume
 ---
 
 # Changelog
+
+## v1.4
+
+### Caracteristicas:
+
+- Report ID cambiado a 0x05:
+  - Agregada temperatura minima del panel al reporte.
+- Agregado manejo de resistencia calefactora.
 
 ## v1.3
 
