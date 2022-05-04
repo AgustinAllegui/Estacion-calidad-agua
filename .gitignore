@@ -1,4 +1,5 @@
 ~$*.xlsx
-src/*.tdf
+~$*.*
+*.tdf
 XXTemp_*.cr8
 devDocs*
