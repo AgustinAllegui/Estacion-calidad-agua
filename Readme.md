@@ -29,6 +29,18 @@ Los datos que se envían mediante el modem satelital se detallan en [este docume
 
 # Changelog
 
+## v1.4.1
+
+### Caracteristicas:
+
+- Ahora se configura el modem al iniciar y se almacena esa configuracion en memoria no volatil.
+- Cambiado manejo de puerto serial para comunicacion en menos pasos.
+- Agregadas carecteristicas de tablas para menejo optimo de memoria.
+
+### BugFixs:
+
+- Ahora desactivar el guardado de temperatura detallado solo desactiva la tabla.
+
 ## v1.4
 
 ### Caracteristicas:
